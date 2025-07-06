@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Pizza World",
+        "menu": ["Pepperoni Pizza", "Veggie Pizza"]
+    },
+    {
+        "name": "Taco Heaven",
+        "menu": ["Tacos al Pastor", "Quesadillas"]
+    },
+    {
+        "name": "Sushi Zen",
+        "menu": ["Salmon Roll", "Tuna Nigiri"]
+    }
+]
