@@ -1,10 +1,16 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
-from app.models import OrderRequest, ChatRequest
-from app.agents import restaurant_discovery_agent
-from app.knowledge_graph import update_user_profile
+from fastapi.middleware.cors import CORSMiddleware
 
+# from app.models import OrderRequest, ChatRequest
+# from app.agents import restaurant_discovery_agent
+# from app.knowledge_graph import update_user_profile
+
+from .agent.triage_agent import traige_agent
+
+from agents import Runner
+
+
+from .schemas import ChatRequest, Response
 
 app = FastAPI()
 app.add_middleware(
@@ -26,13 +32,23 @@ def read_root():
 def greet(name: str):
     return {"Message": f"Hello, {name}!"}
 
-@app.post("/discover")
-async def discover_restaurants(request: ChatRequest):
-    results = restaurant_discovery_agent(request.query, request.user_id)
-    update_user_profile(request.user_id, "searched", request.query)
-    return {"recommendations": results}
 
-@app.post("/order")
-async def place_order(order: OrderRequest):
-    update_user_profile(order.user_id, "ordered", order.item)
-    return {"status": "success", "message": f"Order placed for {order.item}"}
+@app.post("/chat/")
+async def chat(req: ChatRequest):
+    if not req.query.strip():
+        raise HTTPException(status_code=400, detail="Message query cannot be empty")
+
+    try:
+        result = await Runner.run(traige_agent, input=req.query)
+        print(f"Agent response: {result.final_output}")
+        response = result.final_output
+
+        print(f"Extracted response: {response}")
+        if not response:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to extract valid JSON from agent response",
+            )
+        return Response(status="success", data=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
