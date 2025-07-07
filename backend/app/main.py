@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 import uuid
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -7,7 +7,7 @@ import shutil
 from .agent.triage_agent import traige_agent
 from io import BytesIO
 from agents import Runner
-
+import zipfile
 from pathlib import Path
 from .schemas import ChatRequest, Response
 import os
@@ -48,12 +48,10 @@ async def chat(req: ChatRequest):
         result = await Runner.run(traige_agent, input=req.query)
         print(f"Agent response: {result.final_output}")
         response = result.final_output
-
-        print(f"Extracted response: {response}")
         if not response:
             raise HTTPException(
                 status_code=500,
-                detail="Failed to extract valid JSON from agent response",
+                detail="Failed to get agent response",
             )
         return Response(status="success", data=response)
     except Exception as e:
@@ -382,3 +380,17 @@ async def voice_chat_zip(user_id: int, chat_id: int, file: UploadFile = File(...
             "Content-Disposition": f'attachment; filename="voice-chat-{uuid.uuid4().hex[:6]}.zip"'
         },
     )
+
+
+@app.websocket("/ws/chat")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        try:
+            text = await websocket.receive_text()
+            result = await Runner.run(traige_agent, input=text)
+            print(f"Agent response: {result.final_output}")
+            response = result.final_output
+            await websocket.send_text(response)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
