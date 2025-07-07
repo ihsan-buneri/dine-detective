@@ -17,7 +17,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
         className="mb-12"
       >
         <h1 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6 font-futuristic">
-          AETHER
+          Sarah
         </h1>
         <h2 className="text-2xl md:text-4xl font-light text-cyan-300 mb-4">
           NEXUS AI HUB
