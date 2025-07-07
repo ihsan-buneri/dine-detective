@@ -5,6 +5,7 @@ from typing import Optional
 
 class ChatRequest(BaseModel):
     user_id: Optional[int] = None
+    chat_id: Optional[int] = None
     query: str
 
 
