@@ -394,3 +394,83 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_text(response)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.websocket("/ws/chat-text-audio")
+async def websocket_chat(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        try:
+            msg = await websocket.receive_json()
+
+            user_id = msg.get("user_id")
+            chat_id = msg.get("chat_id")
+            is_audio = msg.get("is_audio", False)
+
+            # 1. Validate
+            if is_audio:
+                filename = msg.get("filename")
+                content_type = msg.get("content_type")
+                data_b64 = msg.get("data")
+                if not (filename and content_type and data_b64):
+                    raise HTTPException(422, "Missing audio fields")
+                if not content_type.startswith("audio/"):
+                    raise HTTPException(415, "Invalid audio content_type")
+                # decode bytes
+                original_bytes = base64.b64decode(data_b64)
+                # 2. Transcribe
+                transcription = client.audio.transcriptions.create(
+                    file=(filename, BytesIO(original_bytes), content_type),
+                    model="whisper-large-v3-turbo",
+                    prompt="Specify context or spelling",
+                    response_format="verbose_json",
+                    timestamp_granularities=["word", "segment"],
+                    language="en",
+                    temperature=0.0,
+                )
+                input_text = transcription.text
+
+            else:
+                input_text = msg.get("text", "").strip()
+                if not input_text:
+                    raise HTTPException(422, "Missing `text` for text chat")
+
+            # 3. Agent → get response text
+            result = await Runner.run(traige_agent, input=input_text)
+            response_text = result.final_output.strip()
+            if not response_text:
+                raise ValueError("Empty agent response")
+
+            # 4. TTS
+            if is_audio:
+                tts_buf = BytesIO()
+                gTTS(text=response_text, lang="en").write_to_fp(tts_buf)
+                tts_buf.seek(0)
+                tts_bytes = tts_buf.read()
+                tts_filename = f"tts-{uuid.uuid4().hex[:8]}.mp3"
+                tts_b64 = base64.b64encode(tts_bytes).decode()
+                response = {
+                    "tts_filename": tts_filename,
+                    "tts_data": tts_b64,
+                }
+            else:
+                response = {
+                    "response_text": response_text,
+                    "tts_filename": None,
+                    "tts_data": None,
+                }
+
+            # 5. Send JSON reply
+            await websocket.send_json(response)
+
+        except HTTPException as he:
+            # send an error over WS before closing
+            await websocket.send_json({"error": he.detail})
+            await websocket.close(code=1003)
+            break
+
+        except Exception as e:
+            # unexpected error
+            await websocket.send_json({"error": str(e)})
+            await websocket.close(code=1011)
+            break
