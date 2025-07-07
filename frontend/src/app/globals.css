@@ -29,3 +29,22 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Estiliza o tamanho da barra de rolagem */
+::-webkit-scrollbar {
+  width: 8px;  /* Largura para scroll vertical */
+  height: 8px; /* Altura para scroll horizontal */
+}
+
+/* Estiliza o "polegar" da barra de rolagem (a parte que você arrasta) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-purple-500);  /* Cor do polegar */
+  border-radius: 5px;        /* Bordas arredondadas */
+  border: 1px solid #fff;     /* Borda ao redor do polegar */
+}
+
+/* Estiliza o fundo da barra de rolagem */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;  /* Cor de fundo da barra de rolagem */
+  border-radius: 5px;
+}

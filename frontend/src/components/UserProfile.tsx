@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 interface Message {
   id: string;
-  content: string;
+  query: string;
   isUser: boolean;
   timestamp: Date;
   type?: "text" | "image" | "voice";
@@ -105,7 +105,7 @@ export const UserProfile = ({ messages }: UserProfileProps) => {
                 key={message.id}
                 className="text-xs text-gray-400 p-2 bg-gray-800/30 rounded"
               >
-                <div className="truncate">{message.content}</div>
+                <div className="truncate">{message.query}</div>
                 <div className="text-gray-500 text-xs mt-1">
                   {message.timestamp.toLocaleTimeString()}
                 </div>
@@ -129,9 +129,9 @@ function extractInterests(messages: Message[]): string[] {
   };
 
   messages.forEach(message => {
-    const content = message.content.toLowerCase();
+    const query = message.query.toLowerCase();
     Object.entries(keywords).forEach(([category, words]) => {
-      if (words.some(word => content.includes(word))) {
+      if (words.some(word => query.includes(word))) {
         interests.add(category);
       }
     });
@@ -145,7 +145,7 @@ function extractPreferences(messages: Message[]): { location?: string } {
   
   messages.forEach(message => {
     // Extract location mentions
-    const locationMatch = message.content.match(/(in|at|near) ([A-Z][a-z]+(?: [A-Z][a-z]+)*)/);
+    const locationMatch = message.query.match(/(in|at|near) ([A-Z][a-z]+(?: [A-Z][a-z]+)*)/);
     if (locationMatch) {
       preferences.location = locationMatch[2];
     }
