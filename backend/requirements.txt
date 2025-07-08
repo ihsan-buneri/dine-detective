@@ -1,0 +1,6 @@
+fastapi[standard]>=0.115.14
+groq>=0.29.0
+gtts>=2.5.4
+neo4j>=5.28.1
+openai-agents>=0.1.0
+python-dotenv>=1.1.1
