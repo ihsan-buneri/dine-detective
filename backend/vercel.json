@@ -1,0 +1,22 @@
+{
+	"build": [
+		{
+			"src": "app/main.py",
+			"use": "@vercel/python"
+		}
+	],
+	"routes": [
+		{
+			"src": "/(.*)",
+			"dest": "app/main.py"
+		}
+	],
+	"env": {
+		"GROQ_API_KEY": "@GROQ_API_KEY",
+		"BASE_URL": "@BASE_URL",
+		"BASE_MODEL": "@BASE_MODEL",
+		"NEO4J_DB_URL": "@NEO4J_DB_URL",
+		"NEO4J_DB_USERNAME": "@NEO4J_DB_USERNAME",
+		"NEO4J_DB_PASSWORD": "@neo4j_db_password"
+	}
+}
