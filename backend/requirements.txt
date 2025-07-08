@@ -4,3 +4,4 @@ gtts>=2.5.4
 neo4j>=5.28.1
 openai-agents>=0.1.0
 python-dotenv>=1.1.1
+uvicorn[standard]>=0.30.0
