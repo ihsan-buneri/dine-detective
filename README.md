@@ -1,2 +1,2 @@
-# dine-detective
-This project was built for the Rise to Hack hackathon, organized by Lablab.ai. It’s a suite of AI‑powered agents that simplifies the entire food discovery and ordering workflow—locating nearby restaurants, browsing menus, placing orders, and tracking deliveries—all via natural‑language conversation.
+# Sarah
+Sarah is an AI‑powered personal agent, developed for the Rise to Hack hackathon organized by Lablab.ai. Leveraging advanced natural‑language processing, Sara provides seamless, personalized assistance with food discovery, travel planning, and shopping—delivering tailored recommendations and support entirely through conversational interaction.
