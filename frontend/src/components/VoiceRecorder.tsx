@@ -51,10 +51,12 @@ interface SpeechRecognitionAlternative {
 }
 
 // Extend Window interface for speech recognition
+type SpeechRecognitionConstructor = new () => SpeechRecognition;
+
 declare global {
   interface Window {
-    SpeechRecognition: new () => SpeechRecognition;
-    webkitSpeechRecognition: new () => SpeechRecognition;
+    SpeechRecognition: SpeechRecognitionConstructor;
+    webkitSpeechRecognition: SpeechRecognitionConstructor;
   }
 }
 
